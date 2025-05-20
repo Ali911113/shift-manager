@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>シフト管理簿（履歴付き）</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      margin: 5px;
+      padding: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>シフト管理簿（履歴付き）</h2>
+
+  <label>日付: <input type="date" id="date"></label>
+  <label>氏名（苗字）: <input type="text" id="name"></label>
+  <label>出勤: <input type="time" id="start"></label>
+  <label>休憩開始: <input type="time" id="breakStart"></label>
+  <label>休憩終了: <input type="time" id="breakEnd"></label>
+  <label>退勤: <input type="time" id="end"></label>
+  <button onclick="addRecord()">記録する</button>
+
+  <table id="shiftTable">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>氏名</th>
+        <th>出勤</th>
+        <th>休憩開始</th>
+        <th>休憩終了</th>
+        <th>退勤</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 記録がここに追加されます -->
+    </tbody>
+  </table>
+
+  <script>
+    const records = [];
+
+    function addRecord() {
+      const date = document.getElementById("date").value;
+      const name = document.getElementById("name").value.trim();
+      const start = document.getElementById("start").value;
+      const breakStart = document.getElementById("breakStart").value;
+      const breakEnd = document.getElementById("breakEnd").value;
+      const end = document.getElementById("end").value;
+
+      if (!date || !name || !start || !end) {
+        alert("日付・氏名・出勤・退勤は必須です。");
+        return;
+      }
+
+      // 新しいレコードを追加
+      records.push({
+        date,
+        name,
+        start,
+        breakStart: breakStart || "-",
+        breakEnd: breakEnd || "-",
+        end
+      });
+
+      // 表を更新
+      renderTable();
+
+      // 入力をリセット
+      document.getElementById("date").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("start").value = "";
+      document.getElementById("breakStart").value = "";
+      document.getElementById("breakEnd").value = "";
+      document.getElementById("end").value = "";
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("shiftTable").getElementsByTagName("tbody")[0];
+      tbody.innerHTML = ""; // 既存の内容をクリア
+
+      // 日付 → 氏名 の順にソート
+      const sorted = [...records].sort((a, b) => {
+        if (a.date === b.date) return a.name.localeCompare(b.name);
+        return a.date.localeCompare(b.date);
+      });
+
+      // 表に挿入
+      for (const record of sorted) {
+        const row = tbody.insertRow();
+        row.insertCell(0).textContent = record.date;
+        row.insertCell(1).textContent = record.name;
+        row.insertCell(2).textContent = record.start;
+        row.insertCell(3).textContent = record.breakStart;
+        row.insertCell(4).textContent = record.breakEnd;
+        row.insertCell(5).textContent = record.end;
+      }
+    }
+  </script>
+
+</body>
+</html>
